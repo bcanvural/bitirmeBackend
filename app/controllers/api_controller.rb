@@ -248,9 +248,10 @@ class ApiController < ApplicationController
   end
 
   def get_user
-    if params && params[:id]
+    puts "inside get user"
+    if params && params[:email]
       user = User.where(:email => params[:email]).first
-      render :json => user.to_json, :status => 400
+      render :json => user.to_json, :status => 200
     end
   end
 

@@ -1,1 +1,10 @@
-Glad to find you here! 
+Glad to find you here!
+<% if (@env==nil) %>
+
+It's nil
+
+    <% else %>
+
+    <%= @env %>
+
+<% end %>
