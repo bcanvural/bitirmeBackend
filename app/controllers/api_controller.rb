@@ -1,5 +1,5 @@
 class ApiController < ApplicationController  
-  http_basic_authenticate_with name:ENV["API_AUTH_NAME"], password:ENV["API_AUTH_PASSWORD"], :only => [:signup, :signin, :get_token]  
+  http_basic_authenticate_with name:ENV["API_AUTH_NAME"], password:ENV["API_AUTH_PASSWORD"], :only => [:signup, :signin, :get_token]
   before_filter :check_for_valid_authtoken, :except => [:signup, :signin, :get_token]
   
   def signup
@@ -244,6 +244,13 @@ class ApiController < ApplicationController
     else
       e = Error.new(:status => 401, :message => "Authtoken has expired. Please get a new token and try again!")
       render :json => e.to_json, :status => 401
+    end
+  end
+
+  def get_user
+    if params && params[:id]
+      user = User.where(:email => params[:email]).first
+      render :json => user.to_json, :status => 400
     end
   end
 
