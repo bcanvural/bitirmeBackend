@@ -1,6 +1,11 @@
 class User < ActiveRecord::Base
+  #include ActiveModel::Validations
   attr_accessor :password
   before_save :encrypt_password
+
+
+  validate :both_roles, :on=> :create
+
   
   validates_confirmation_of :password  
   validates_presence_of :email, :on => :create    
@@ -9,7 +14,13 @@ class User < ActiveRecord::Base
   validates_format_of :email, :with => /\A[^@]+@([^@\.]+\.)+[^@\.]+\z/
   validates_uniqueness_of :email
   has_many :photos
-    
+
+  # def role_validator
+  #   return !((instructor==false) && (student==false))
+  # end
+
+
+
   def encrypt_password
     if password.present?      
       self.password_salt = BCrypt::Engine.generate_salt
@@ -45,5 +56,13 @@ class User < ActiveRecord::Base
   def to_json(options={})
     options[:except] ||= [:id, :password_hash, :password_salt, :email_verification, :verification_code, :created_at, :updated_at]
     super(options)
-  end    
+  end
+
+  private
+  def both_roles
+    if self.instructor? == false && self.student? == false
+      errors.add(:instructor, "instructor and student cannot be both false")
+    end
+  end
+
 end
