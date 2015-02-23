@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   get 'api/get_token'  
   get 'api/clear_token'
   get 'api/get_user', to:"api#get_user"
+  get 'api/get_courses'
   match "*path", to: "application#page_not_found", via: :all
 
 

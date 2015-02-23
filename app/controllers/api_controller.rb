@@ -55,7 +55,7 @@ class ApiController < ApplicationController
           
               user.update_attributes(:api_authtoken => auth_token, :authtoken_expiry => auth_expiry)    
             end 
-                                   
+
             render :json => user.to_json, :status => 200
           else
             e = Error.new(:status => 401, :message => "Wrong Password")
@@ -259,7 +259,7 @@ class ApiController < ApplicationController
     studentcourses = StudentCourse.where(:user_id=>@user.id)
     courses = Array.new
     studentcourses.each do |sc|
-      courses.push(Course.where(:user_id=>sc.user_id).first)
+      courses.push(Course.where(:id=>sc.course_id).first)
     end
     render :json => courses.to_json, :status => 200
   end
@@ -281,7 +281,7 @@ class ApiController < ApplicationController
   
   def user_params
     params.require(:user).permit(:first_name, :last_name, :email, :password, :password_hash, :password_salt, :verification_code, 
-    :email_verification, :api_authtoken, :authtoken_expiry)
+    :email_verification, :api_authtoken, :authtoken_expiry, :instructor, :student)
   end
   
   def photo_params
