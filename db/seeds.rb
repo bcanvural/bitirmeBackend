@@ -9,11 +9,9 @@
 require 'faker'
 include Faker
 
-%w(CS201 CS204 CS300 CS408 CS310 )
-
-#StudentCourse.destroy_all
 User.destroy_all
 Course.destroy_all
+StudentCourse.destroy_all
 
 50.times do
 
@@ -42,36 +40,14 @@ end
     end
   end
 
-
-
-
-
-
-
-# create_table "users", force: true do |t|
-#   t.string   "first_name"
-#   t.string   "last_name"
-#   t.string   "email"
-#   t.string   "password_hash"
-#   t.string   "password_salt"
-#   t.boolean  "email_verification", default: false
-#   t.string   "verification_code"
-#   t.string   "api_authtoken"
-#   t.datetime "authtoken_expiry"
-#   t.datetime "created_at"
-#   t.datetime "updated_at"
-#   t.boolean  "instructor"
-#   t.boolean  "student"
-#   t.string   "udid"
-# end
-#
-# movie = Movie.create(:name=>Company.bs,
-#                      :director=>"#{Name.name}",
-#                      :description=>Lorem.paragraphs.join("<br/>"),
-#                      :year=> rand(1940..2015),
-#                      :length=>rand(20..240),
-#                      :format=>formats[rand(formats.length)],
-#                      :image=>"movies/"+images[rand(images.length)],
-#                      :thumbnail=>"movies/"+images[rand(images.length)]
-#
-# )
+User.where(student: true).find_each do |user|
+  randNum = rand(3..5)
+  randNum.times do
+    course = Course.offset(rand(Course.count)).first
+    student_course = StudentCourse.create(
+        :course_id =>course.id,
+        :user_id => user.id
+    )
+    student_course.save
+  end
+end
