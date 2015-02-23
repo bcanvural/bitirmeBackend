@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150223114622) do
+ActiveRecord::Schema.define(version: 20150223201215) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,8 +67,8 @@ ActiveRecord::Schema.define(version: 20150223114622) do
     t.datetime "authtoken_expiry"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "instructor"
-    t.boolean  "student"
+    t.boolean  "instructor",         default: false
+    t.boolean  "student",            default: true
     t.string   "udid"
   end
 

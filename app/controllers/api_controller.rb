@@ -255,6 +255,15 @@ class ApiController < ApplicationController
     end
   end
 
+  def get_courses
+    studentcourses = StudentCourse.where(:user_id=>@user.id)
+    courses = Array.new
+    studentcourses.each do |sc|
+      courses.push(Course.where(:user_id=>sc.user_id).first)
+    end
+    render :json => courses.to_json, :status => 200
+  end
+
   private 
   
   def check_for_valid_authtoken
@@ -262,7 +271,7 @@ class ApiController < ApplicationController
       @user = User.where(:api_authtoken => token).first      
     end
   end
-  
+
   def rand_string(len)
     o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten
     string  =  (0..len).map{ o[rand(o.length)]  }.join
