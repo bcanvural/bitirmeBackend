@@ -27,7 +27,16 @@ user.save
 
 end
 
-firat = User.where(:first_name => "firat")
+firat = User.create( :first_name => "Firat",
+                    :last_name=> "Sertgoz",
+                    :email => "firatsertgoz@sabanciuniv.edu",
+                    :password => '12345678',
+                    :instructor => rand(2),
+                    :student => rand(2),
+                    :udid => Bitcoin.address
+)
+firat.save
+
 rand_course = Course.offset(rand(Course.count)).first
 stu_course = StudentCourse.new(:course_id=>rand_course.id,:user_id=>firat.id)
 stu_course.save!
