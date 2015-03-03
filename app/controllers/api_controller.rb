@@ -263,16 +263,17 @@ class ApiController < ApplicationController
         ls_array.each do |ls|
           attendances.push(Attendance.where(:user_id => @user.id,:lecture_session_id => ls.id))
         end
-        render :json=> (generate_lecture_session_custom_json ls_array.count ,attendances), :status => 200
+        render :json=> (generate_lecture_session_custom_json ls_array.count ,attendances, LectureSession.where(:course_id=>params[:course_id])), :status => 200
       end
     end
 
     private
 
-  def generate_lecture_session_custom_json count ,attendance
+  def generate_lecture_session_custom_json count ,attendance, all_sessions
     require 'json'
     lecture_session_custom = {:lecture_session_count => count,
-                              :attendance => attendance}
+                              :attendance => attendance,
+                              :all_sessions => all_sessions}
     return JSON.generate(lecture_session_custom)
   end
     def check_for_valid_authtoken
