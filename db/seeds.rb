@@ -27,7 +27,10 @@ user.save
 
 end
 
-
+firat = User.where(:first_name => "firat")
+rand_course = Course.offset(rand(Course.count)).first
+stu_course = StudentCourse.new(:course_id=>rand_course.id,:user_id=>firat.id)
+stu_course.save!
 
   User.where(instructor: true).find_each do |user|
     randNum = rand(1..3)
