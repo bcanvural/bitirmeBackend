@@ -9,7 +9,7 @@
 require 'faker'
 include Faker
 
-#User.destroy_all
+User.destroy_all
 Course.destroy_all
 StudentCourse.destroy_all
 
