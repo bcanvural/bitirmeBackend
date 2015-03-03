@@ -27,19 +27,7 @@ user.save
 
 end
 
-firat = User.create( :first_name => "Firat",
-                    :last_name=> "Sertgoz",
-                    :email => "firatsertgoz@sabanciuniv.edu",
-                    :password => '12345678',
-                    :instructor => rand(2),
-                    :student => rand(2),
-                    :udid => Bitcoin.address
-)
-firat.save
 
-rand_course = Course.offset(rand(Course.count)).first
-stu_course = StudentCourse.new(:course_id=>rand_course.id,:user_id=>firat.id)
-stu_course.save!
 
   User.where(instructor: true).find_each do |user|
     randNum = rand(1..3)
@@ -63,3 +51,17 @@ User.where(student: true).find_each do |user|
     student_course.save
   end
 end
+
+firat = User.create( :first_name => "Firat",
+                     :last_name=> "Sertgoz",
+                     :email => "firatsertgoz@sabanciuniv.edu",
+                     :password => '12345678',
+                     :instructor => rand(2),
+                     :student => rand(2),
+                     :udid => Bitcoin.address
+)
+firat.save
+
+rand_course = Course.offset(rand(Course.count)).first
+stu_course = StudentCourse.new(:course_id=>rand_course.id,:user_id=>firat.id)
+stu_course.save!
