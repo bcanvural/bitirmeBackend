@@ -163,11 +163,16 @@ class ApiController < ApplicationController
     end
   end
 
+
   def get_courses
-    studentcourses = StudentCourse.where(:user_id=>@user.id)
     courses = Array.new
-    studentcourses.each do |sc|
-      courses.push(Course.where(:id=>sc.course_id).first)
+    if @user.student?
+      studentcourses = StudentCourse.where(:user_id=>@user.id)
+      studentcourses.each do |sc|
+        courses.push(Course.where(:id=>sc.course_id).first)
+      end
+    else
+      courses = Course.where(:user_id => @user.id)
     end
     render :json => courses.to_json, :status => 200
   end
