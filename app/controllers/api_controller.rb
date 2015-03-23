@@ -52,7 +52,7 @@ class ApiController < ApplicationController
         if user
           if User.authenticate(params[:email], params[:password])
 
-            if !user.api_authtoken || (user.api_authtoken && user.authtoken_expiry < Time.now)
+            if !user.api_authtoken
               auth_token = rand_string(20)
               auth_expiry = Time.now + (24*60*60)
 
