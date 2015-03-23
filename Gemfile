@@ -47,3 +47,5 @@ gem 'spring',        group: :development
 gem 'faker'
 gem 'rqrcode'
 
+gem 'rails_admin', '~> 0.6.7'
+

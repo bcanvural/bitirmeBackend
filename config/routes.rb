@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root 'home#index'
 
   get 'home/index'
@@ -24,7 +25,7 @@ Rails.application.routes.draw do
 
 
 
-  match "*path", to: "application#page_not_found", via: :all
+  #match "*path", to: "application#page_not_found", via: :all
 
 
 
