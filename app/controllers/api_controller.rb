@@ -2,6 +2,9 @@ class ApiController < ApplicationController
   http_basic_authenticate_with name:ENV["API_AUTH_NAME"], password:ENV["API_AUTH_PASSWORD"], :only => [:signup, :signin, :get_token]
   before_filter :check_for_valid_authtoken, :except => [:signup, :signin, :get_token]
 
+  require 'rubygems'
+  require 'rqrcode'
+
   def signup
     if request.post?
       if params && params[:full_name] && params[:email] && params[:password]
@@ -176,9 +179,9 @@ class ApiController < ApplicationController
         if Course.where(:id=>params[:course_id]) #such a course exists
           ls = LectureSession.new(:course_id=>params[:course_id],
                                   :user_id=>@user.id,
-                                  :qrcode=>@qrcode)
+                                  :qrcode=>@qrcode_string)
           if ls.save
-            render :json => ls.to_json, :status => 201 #created
+            render :json => ls.to_json, :status => 200 #created
           else
             e = Error.new(:status => 400, :message => "Cannot create lecture session.")
             render :json => e.to_json, :status => 400
@@ -258,14 +261,41 @@ class ApiController < ApplicationController
 
     def get_attended_sessions_by_course_id
       if params && params[:course_id]
+        puts "inside get_attended... course id is:#{params[:course_id]} "
         ls_array = LectureSession.where(:course_id => params[:course_id])
         attendances = []
         ls_array.each do |ls|
           attendances.push(Attendance.where(:user_id => @user.id,:lecture_session_id => ls.id))
         end
         render :json=> (generate_lecture_session_custom_json ls_array.count ,attendances, LectureSession.where(:course_id=>params[:course_id])), :status => 200
+      else
+        puts "inside else in get_attended_sessions..."
+        e = Error.new(:status => 400, :message => "Bad request")
+        render :json => e.to_json, :status => 400
       end
+
     end
+
+  def update_location_info
+    if request.post? && params && params[:loc_x] && params[:loc_y]
+      ul = UserLocation.where(:user_id=>@user.id)
+      if ul
+        ul.loc_x = params[:loc_x]; ul.loc_y = params[:loc_y]
+        ul.update_last_viewed_at  get_time
+        ul.save
+        render :json => ul.to_json, :status => 200
+      else
+        ul = UserLocation.new(:user_id=>@user.id,
+                              :loc_x => params[:loc_x],
+                              :loc_y => params[:loc_y])
+        ul.save
+        render :json => ul.to_json, :status => 200
+      end
+    else
+      e = Error.new(:status => 400, :message => "Bad request")
+      render :json => e.to_json, :status => 400
+    end
+  end
 
     private
 
@@ -298,9 +328,13 @@ class ApiController < ApplicationController
     end
 
     def generate_qrcode(course_id)
-      require 'rqrcode'
-      @qrcode = RQRCODE::QRCode.new("#{Time.now.to_i},#{course_id},#{@user.api_authtoken}")
+
+      @qrcode = RQRCode::QRCode.new("#{Time.now.to_i},#{course_id}")
+      @qrcode_string = ("#{Time.now.to_i},#{course_id}")
     end
+
+
+
   end
 
 

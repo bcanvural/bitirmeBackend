@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   get 'api/get_lecture_sessions_by_course_id' #5
   get 'api/get_student_list_by_lecture_session_id' #6
   get 'api/get_attended_sessions_by_course_id' #7
-  get 'api/create_lecturesession_by_course_id' #2
+  post 'api/create_lecturesession_by_course_id' #2
   post 'api/attend' #3
 
 

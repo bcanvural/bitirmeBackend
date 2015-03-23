@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  loc_x: 1.5
+  loc_y: 1.5
+
+two:
+  loc_x: 1.5
+  loc_y: 1.5

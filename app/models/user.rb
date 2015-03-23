@@ -58,6 +58,10 @@ class User < ActiveRecord::Base
     super(options)
   end
 
+  def currently_in_school?
+
+  end
+
   private
   def both_roles
     if self.instructor? == false && self.student? == false
