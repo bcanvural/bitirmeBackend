@@ -3,7 +3,7 @@ class ApiController < ApplicationController
   before_filter :check_for_valid_authtoken, :except => [:signup, :signin, :get_token]
 
   require 'rubygems'
-  require 'rqrcode'
+
 
   def signup
     if request.post?
@@ -274,8 +274,10 @@ class ApiController < ApplicationController
         ce_array = CourseEntity.where(:course_id => params[:course_id])
         attendances= []
         ce_array.each do |ce|
-          attendances.push(AttendanceList.where(:course_entity_id => ce.id,:user_id => @user.id).first())
-          puts "First Attendance:#{attendances}"
+          tmp = AttendanceList.where(:course_entity_id => ce.id,:user_id => @user.id)
+         if tmp.count!=0
+           attendances.concat(tmp)
+         end
         end
         #render :json=> (generate_lecture_session_custom_json attendances.count ,attendances, CourseEntity.where(:course_id=>params[:course_id])), :status => 200
         render :json => attendances.to_json, :status => 200
@@ -291,7 +293,10 @@ class ApiController < ApplicationController
       studentcourses=StudentCourse.where(:user_id => @user.id)
       coursentity= []
       studentcourses.each do |stuc|
-        coursentity.push(CourseEntity.where(:course_id => stuc.course_id))
+        tmp = CourseEntity.where(:course_id => stuc.course_id)
+        if tmp.count!=0
+          coursentity.concat(tmp)
+        end
       end
       render :json => coursentity.to_json, status =>200
     end

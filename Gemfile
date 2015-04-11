@@ -45,7 +45,5 @@ gem 'spring',        group: :development
 # gem 'debugger', group: [:development, :test]
 
 gem 'faker'
-gem 'rqrcode'
-
 gem 'rails_admin', '~> 0.6.7'
 

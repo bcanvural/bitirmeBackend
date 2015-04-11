@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   post 'api/create_lecturesession_by_course_id' #2
   post 'api/attend' #3
 
+  get 'api/get_course_entities'
+
 
 
   #match "*path", to: "application#page_not_found", via: :all
