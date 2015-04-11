@@ -287,8 +287,12 @@ class ApiController < ApplicationController
 
     end
 
-    def get_course_entity
-      coursentity=CourseEntity.where(:user_id => @user.id)
+    def get_course_entities
+      studentcourses=StudentCourse.where(:user_id => @user.id)
+      coursentity= []
+      studentcourses.each do |stuc|
+        coursentity.push(CourseEntity.where(:course_id => stuc.course_id))
+      end
       render :json => coursentity.to_json, status =>200
     end
 
