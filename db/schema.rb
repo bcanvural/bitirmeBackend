@@ -11,17 +11,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150309150442) do
+ActiveRecord::Schema.define(version: 20150410203043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "attendances", force: true do |t|
-    t.integer  "lecture_session_id"
+  create_table "attendance_lists", force: true do |t|
     t.integer  "user_id"
+    t.integer  "course_entity_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "attendance_lists", ["course_entity_id"], name: "index_attendance_lists_on_course_entity_id", using: :btree
+  add_index "attendance_lists", ["user_id"], name: "index_attendance_lists_on_user_id", using: :btree
+
+  create_table "course_entities", force: true do |t|
+    t.string   "day"
+    t.integer  "course_id"
+    t.string   "location"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "course_entities", ["course_id"], name: "index_course_entities_on_course_id", using: :btree
 
   create_table "courses", force: true do |t|
     t.string   "name"
@@ -30,41 +45,12 @@ ActiveRecord::Schema.define(version: 20150309150442) do
     t.datetime "updated_at"
   end
 
-  create_table "lecture_sessions", force: true do |t|
-    t.integer  "course_id"
-    t.integer  "user_id"
-    t.string   "qrcode"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "photos", force: true do |t|
-    t.string   "name"
-    t.string   "title"
-    t.string   "image_url"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "random_id"
-  end
-
   create_table "student_courses", force: true do |t|
     t.integer  "course_id"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  create_table "user_locations", force: true do |t|
-    t.float    "loc_x"
-    t.float    "loc_y"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_id"
-    t.datetime "last_updated_at"
-  end
-
-  add_index "user_locations", ["user_id"], name: "index_user_locations_on_user_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "first_name"

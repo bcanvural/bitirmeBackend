@@ -156,7 +156,6 @@ class ApiController < ApplicationController
 
 
   def get_user
-    puts "inside get user"
     if params && params[:email]
       user = User.where(:email => params[:email]).first
       render :json => user.to_json, :status => 200
@@ -231,10 +230,10 @@ class ApiController < ApplicationController
 
     def get_user_attendance_by_course_id
       if params && params[:course_id]
-        ls_array = LectureSession.where(:course_id => params[:course_id])
+        ce_array = CourseEntity.where(:course_id => params[:course_id])
         attendance_array = []
-        ls_array.each do |ls|
-          attendance_array.push(Attendance.where(:lecture_session_id => ls.id,:user_id => @user.id))
+        ce_array.each do |ce|
+          attendance_array.push(AttendanceList.where(:course_entity_id => ce.id,:user_id => @user.id))
         end
         render :json => attendance_array.to_json, :status => 200
       else
@@ -254,8 +253,13 @@ class ApiController < ApplicationController
     end
 
     def get_student_list_by_lecture_session_id
-      if params && params[:lecture_session_id]
-        attendances = Attendance.where(:lecture_session_id => params[:lecture_session_id])
+      if params && params[:course_id]
+        course_entities_array = CourseEntity.where(:course_id => params[:course_id])
+        attendances = []
+        course_entities_array.each do |ce|
+           attendances = AttendanceList.where(:course_entity_id => ce)
+        end
+        #attendances = Attendance.where(:lecture_session_id => params[:lecture_session_id])
         users = []
         attendances.each do |attendance|
           users.push(User.where(:id=>attendance.user_id).select(:first_name,:last_name,:email))
@@ -267,12 +271,14 @@ class ApiController < ApplicationController
     def get_attended_sessions_by_course_id
       if params && params[:course_id]
         puts "inside get_attended... course id is:#{params[:course_id]} "
-        ls_array = LectureSession.where(:course_id => params[:course_id])
-        attendances = []
-        ls_array.each do |ls|
-          attendances.push(Attendance.where(:user_id => @user.id,:lecture_session_id => ls.id))
+        ce_array = CourseEntity.where(:course_id => params[:course_id])
+        attendances= []
+        ce_array.each do |ce|
+          attendances.push(AttendanceList.where(:course_entity_id => ce.id,:user_id => @user.id).first())
+          puts "First Attendance:#{attendances}"
         end
-        render :json=> (generate_lecture_session_custom_json ls_array.count ,attendances, LectureSession.where(:course_id=>params[:course_id])), :status => 200
+        #render :json=> (generate_lecture_session_custom_json attendances.count ,attendances, CourseEntity.where(:course_id=>params[:course_id])), :status => 200
+        render :json => attendances.to_json, :status => 200
       else
         puts "inside else in get_attended_sessions..."
         e = Error.new(:status => 400, :message => "Bad request")
@@ -281,26 +287,26 @@ class ApiController < ApplicationController
 
     end
 
-  def update_location_info
-    if request.post? && params && params[:loc_x] && params[:loc_y]
-      ul = UserLocation.where(:user_id=>@user.id)
-      if ul
-        ul.loc_x = params[:loc_x]; ul.loc_y = params[:loc_y]
-        ul.update_last_viewed_at  get_time
-        ul.save
-        render :json => ul.to_json, :status => 200
-      else
-        ul = UserLocation.new(:user_id=>@user.id,
-                              :loc_x => params[:loc_x],
-                              :loc_y => params[:loc_y])
-        ul.save
-        render :json => ul.to_json, :status => 200
-      end
-    else
-      e = Error.new(:status => 400, :message => "Bad request")
-      render :json => e.to_json, :status => 400
-    end
-  end
+  # def update_location_info
+  #   if request.post? && params && params[:loc_x] && params[:loc_y]
+  #     ul = UserLocation.where(:user_id=>@user.id)
+  #     if ul
+  #       ul.loc_x = params[:loc_x]; ul.loc_y = params[:loc_y]
+  #       ul.update_last_viewed_at  get_time
+  #       ul.save
+  #       render :json => ul.to_json, :status => 200
+  #     else
+  #       ul = UserLocation.new(:user_id=>@user.id,
+  #                             :loc_x => params[:loc_x],
+  #                             :loc_y => params[:loc_y])
+  #       ul.save
+  #       render :json => ul.to_json, :status => 200
+  #     end
+  #   else
+  #     e = Error.new(:status => 400, :message => "Bad request")
+  #     render :json => e.to_json, :status => 400
+  #   end
+  # end
 
     private
 
