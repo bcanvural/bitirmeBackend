@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   post 'api/attend' #3
 
   get 'api/get_course_entities'
+  get 'api/get_term_start_date'
 
 
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150410203043) do
+ActiveRecord::Schema.define(version: 20150411150225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,12 @@ ActiveRecord::Schema.define(version: 20150410203043) do
 
   add_index "attendance_lists", ["course_entity_id"], name: "index_attendance_lists_on_course_entity_id", using: :btree
   add_index "attendance_lists", ["user_id"], name: "index_attendance_lists_on_user_id", using: :btree
+
+  create_table "constants", force: true do |t|
+    t.date     "termstartdate"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "course_entities", force: true do |t|
     t.string   "day"

@@ -300,6 +300,10 @@ class ApiController < ApplicationController
       end
       render :json => coursentity.to_json, status =>200
     end
+    def get_term_start_date
+      startdate = Constants.find(1)
+      render :json => startdate.to_json, status => 200
+    end
 
   # def update_location_info
   #   if request.post? && params && params[:loc_x] && params[:loc_y]
