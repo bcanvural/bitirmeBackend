@@ -305,26 +305,25 @@ class ApiController < ApplicationController
       render :json => startdate.to_json, status => 200
     end
 
-  # def update_location_info
-  #   if request.post? && params && params[:loc_x] && params[:loc_y]
-  #     ul = UserLocation.where(:user_id=>@user.id)
-  #     if ul
-  #       ul.loc_x = params[:loc_x]; ul.loc_y = params[:loc_y]
-  #       ul.update_last_viewed_at  get_time
-  #       ul.save
-  #       render :json => ul.to_json, :status => 200
-  #     else
-  #       ul = UserLocation.new(:user_id=>@user.id,
-  #                             :loc_x => params[:loc_x],
-  #                             :loc_y => params[:loc_y])
-  #       ul.save
-  #       render :json => ul.to_json, :status => 200
-  #     end
-  #   else
-  #     e = Error.new(:status => 400, :message => "Bad request")
-  #     render :json => e.to_json, :status => 400
-  #   end
-  # end
+    def get_attendees_by_course_id
+      if params && params[:course_id]
+        require 'json'
+        sc_arr = StudentCourse.where(:course_id => params[:course_id])
+        students = []
+        sc_arr.each do |sc|
+          al_arr = AttendanceList.where(:user_id=>sc.user_id)
+          al_arr.each do |al|
+          custom = {
+              :name => User.where(:id => sc.user_id).first().first_name,
+              :attendance_date => al.created_at,
+              :total_lectures => getTotalLectures(params[:course_id])
+          }
+          students.push(custom)
+            end
+        end
+        render :json => students.to_json, status => 200
+      end
+    end
 
     private
 
@@ -361,6 +360,10 @@ class ApiController < ApplicationController
       @qrcode = RQRCode::QRCode.new("#{Time.now.to_i},#{course_id}")
       @qrcode_string = ("#{Time.now.to_i},#{course_id}")
     end
+
+  def getTotalLectures c_id
+    return CourseEntity.where(:course_id => c_id).count() * ((Time.now.to_i - Constants.first().termstartdate.to_time.to_i) / (60*60*24*7))
+  end
 
 
 
