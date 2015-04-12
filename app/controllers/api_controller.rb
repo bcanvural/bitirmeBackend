@@ -324,13 +324,14 @@ class ApiController < ApplicationController
         render :json => students.to_json, status => 200
       end
     end
+
+
     def get_attendance_count_for_graph
-      if params && params[:course_id] && params[:options] && (params[:options]==0 || params[:options]==1 || params[:options]==2)
+      if params && params[:course_id] && params[:option] && (params[:option]=="0" || params[:option]=="1" || params[:option]=="2")
         require 'json'
         custom = []
         course_entities = CourseEntity.where(:course_id => params[:course_id])
-        case params[:options]
-          when 0
+        if params[:option]=="0"
             course_entities.each do |ce|
               custom_attendance_count = {:day => ce.day,
                                          :start_time => ce.start_time,
@@ -338,30 +339,34 @@ class ApiController < ApplicationController
                                         }
               custom.push(custom_attendance_count)
             end
-          when 1
+          elsif params[:option]=="1"
             course_entities.each do |ce|
               custom_attendance_count = {:day => ce.day,
                                          :start_time => ce.start_time,
                                          :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
-                                                                        .where("create_date > ?",((Time.now-(4*7*24*60*60)).to_time))
+                                                                        .where("created_at > ?",((Time.now-(4*7*24*60*60)).to_time))
                                                                         .count()
                                         }
               custom.push(custom_attendance_count)
             end
-          when 2
+          elsif params[:option]=="2"
             course_entities.each do |ce|
               custom_attendance_count = {:day => ce.day,
                                          :start_time => ce.start_time,
                                          :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
-                                                                        .where("create_date > ?",((Time.now-(1*7*24*60*60)).to_time))
+                                                                        .where("created_at > ?",((Time.now-(1*7*24*60*60)).to_time))
                                                                         .count()
               }
               custom.push(custom_attendance_count)
-        end
-        end
+            end
+          else
+            render :json => custom.to_json, status => 400
+           end
         render :json => custom.to_json, status => 200
+    else
+      render :json => Array.new.to_json, status => 400
       end
-      end
+    end
 
     private
 
