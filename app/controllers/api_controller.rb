@@ -324,6 +324,44 @@ class ApiController < ApplicationController
         render :json => students.to_json, status => 200
       end
     end
+    def get_attendance_count_for_graph
+      if params && params[:course_id] && params[:options] && (params[:options]==0 || params[:options]==1 || params[:options]==2)
+        require 'json'
+        custom = []
+        course_entities = CourseEntity.where(:course_id => params[:course_id])
+        case params[:options]
+          when 0
+            course_entities.each do |ce|
+              custom_attendance_count = {:day => ce.day,
+                                         :start_time => ce.start_time,
+                                         :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id).count()
+                                        }
+              custom.push(custom_attendance_count)
+            end
+          when 1
+            course_entities.each do |ce|
+              custom_attendance_count = {:day => ce.day,
+                                         :start_time => ce.start_time,
+                                         :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
+                                                                        .where("create_date > ?",((Time.now-(4*7*24*60*60)).to_time))
+                                                                        .count()
+                                        }
+              custom.push(custom_attendance_count)
+            end
+          when 2
+            course_entities.each do |ce|
+              custom_attendance_count = {:day => ce.day,
+                                         :start_time => ce.start_time,
+                                         :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
+                                                                        .where("create_date > ?",((Time.now-(1*7*24*60*60)).to_time))
+                                                                        .count()
+              }
+              custom.push(custom_attendance_count)
+        end
+        end
+        render :json => custom.to_json, status => 200
+      end
+      end
 
     private
 
