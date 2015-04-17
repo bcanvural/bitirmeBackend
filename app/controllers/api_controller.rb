@@ -3,8 +3,7 @@ class ApiController < ApplicationController
   before_filter :check_for_valid_authtoken, :except => [:signup, :signin, :get_token]
 
   require 'rubygems'
-
-
+  
   def signup
     if request.post?
       if params && params[:full_name] && params[:email] && params[:password]
