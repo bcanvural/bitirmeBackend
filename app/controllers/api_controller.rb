@@ -153,8 +153,6 @@ class ApiController < ApplicationController
     end
   end
 
-
-
   def get_user
     if params && params[:email]
       user = User.where(:email => params[:email]).first
@@ -164,69 +162,19 @@ class ApiController < ApplicationController
 
 
   def get_courses
-    courses = Array.new
+    custom = []
     if @user.student?
       studentcourses = StudentCourse.where(:user_id=>@user.id)
       studentcourses.each do |sc|
-        courses.push(Course.where(:id=>sc.course_id).first)
+        #courses.push(Course.where(:id=>sc.course_id).first)
+        custom.push(:course=>Course.where(:id=>sc.course_id).first,
+                    :attendance_percentage=>getAttendancePercentage(sc.course_id))
       end
     else
-      courses = Course.where(:user_id => @user.id)
+      custom.push(:course=>Course.where(:user_id => @user.id).first)
     end
-    render :json => courses.to_json, :status => 200
+    render :json => custom.to_json, :status => 200
   end
-
-  def create_lecturesession_by_course_id
-    if request.post?
-      if params && params[:course_id]
-        generate_qrcode(params[:course_id])
-        if Course.where(:id=>params[:course_id]) #such a course exists
-          ls = LectureSession.new(:course_id=>params[:course_id],
-                                  :user_id=>@user.id,
-                                  :qrcode=>@qrcode_string)
-          if ls.save
-            render :json => ls.to_json, :status => 200 #created
-          else
-            e = Error.new(:status => 400, :message => "Cannot create lecture session.")
-            render :json => e.to_json, :status => 400
-          end
-        end
-      end
-    end
-  end
-
-
-    def attend
-      if request.post?
-        if params && params[:qrcode]
-          ls = LectureSession.where(:qrcode=>params[:qrcode])
-          if ls && ls.qrcode==params[:qrcode]
-            qrcode_parsed = ls.qrcode.split(',')
-            if Time.now - qrcode_parsed[0] < 10*60*60
-              attendance = Attendance.new(:lecture_session_id=>ls.id,
-                                          :user_id=>@user.id)
-              if attendance.save
-                render :json => attendance.to_json, :status => 201 #created
-              else
-                e = Error.new(:status => 400, :message => "Cannot create attendance.")
-                render :json => e.to_json, :status => 400
-              end
-            else
-              e = Error.new(:status => 400, :message => "Too late to give attendance.")
-              render :json => e.to_json, :status => 400
-            end
-          else
-            #no lecturesessin or qrcode mismatch
-            e = Error.new(:status => 400, :message => "No such lecturesession or qrcode mismatch")
-            render :json => e.to_json, :status => 400
-          end
-        else
-          e = Error.new(:status => 400, :message => "Bad request")
-          render :json => e.to_json, :status => 400
-        end
-      end
-
-    end
 
     def get_user_attendance_by_course_id
       if params && params[:course_id]
@@ -236,16 +184,6 @@ class ApiController < ApplicationController
           attendance_array.push(AttendanceList.where(:course_entity_id => ce.id,:user_id => @user.id))
         end
         render :json => attendance_array.to_json, :status => 200
-      else
-        e = Error.new(:status => 400, :message => "Bad request")
-        render :json => e.to_json, :status => 400
-      end
-    end
-
-    def get_lecture_sessions_by_course_id
-      if params && params[:course_id]
-        ls_array = LectureSession.where(:course_id => params[:course_id])
-        render :json => ls_array.to_json, :status => 200
       else
         e = Error.new(:status => 400, :message => "Bad request")
         render :json => e.to_json, :status => 400
@@ -324,7 +262,6 @@ class ApiController < ApplicationController
         render :json => students.to_json, status => 200
       end
     end
-
 
     def get_attendance_count_for_graph
       if params && params[:course_id] && params[:option] && (params[:option]=="0" || params[:option]=="1" || params[:option]=="2")
@@ -406,6 +343,10 @@ class ApiController < ApplicationController
 
   def getTotalLectures c_id
     return CourseEntity.where(:course_id => c_id).count() * ((Time.now.to_i - Constants.first().termstartdate.to_time.to_i) / (60*60*24*7))
+  end
+
+  def getAttendancePercentage c_id
+    return ((AttendanceList.where(:user_id=>@user.id,:course_entity_id => CourseEntity.where(:course_id => c_id).first.id).count() / 1.0) / getTotalLectures(c_id)) * 100
   end
 
 

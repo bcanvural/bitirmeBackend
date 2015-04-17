@@ -17,11 +17,10 @@ Rails.application.routes.draw do
   get 'api/get_user', to:"api#get_user"
   get 'api/get_courses'#1
   get 'api/get_user_attendance_by_course_id'  #4
-  get 'api/get_lecture_sessions_by_course_id' #5
   get 'api/get_student_list_by_lecture_session_id' #6
   get 'api/get_attended_sessions_by_course_id' #7
-  post 'api/create_lecturesession_by_course_id' #2
-  post 'api/attend' #3
+
+
 
   get 'api/get_course_entities'
   get 'api/get_term_start_date'
