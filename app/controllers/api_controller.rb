@@ -3,7 +3,7 @@ class ApiController < ApplicationController
   before_filter :check_for_valid_authtoken, :except => [:signup, :signin, :get_token]
 
   require 'rubygems'
-  
+
   def signup
     if request.post?
       if params && params[:full_name] && params[:email] && params[:password]
@@ -165,7 +165,6 @@ class ApiController < ApplicationController
     if @user.student?
       studentcourses = StudentCourse.where(:user_id=>@user.id)
       studentcourses.each do |sc|
-        #courses.push(Course.where(:id=>sc.course_id).first)
         custom.push(:course=>Course.where(:id=>sc.course_id).first,
                     :attendance_percentage=>getAttendancePercentage(sc.course_id))
       end
@@ -303,6 +302,28 @@ class ApiController < ApplicationController
       render :json => Array.new.to_json, status => 400
       end
     end
+
+  def attend
+    if request.post? && params && params[:course_entity_id]
+      attendance = AttendanceList.new(
+                                     :course_entity_id => params[:course_entity_id],
+                                     :user_id => @user.id
+      )
+      if attendance.save
+        render :json => attendance.to_json, :status => 200
+      else
+        error_str = ""
+        attendance.errors.each{|attr, msg|
+          error_str += "#{attr} - #{msg},"
+        }
+        e = Error.new(:status => 400, :message => error_str)
+        render :json => e.to_json, :status => 400
+       end
+    else
+      e = Error.new(:status => 400, :message => "required parameters are missing")
+      render :json => e.to_json, :status => 400
+      end
+  end
 
     private
 

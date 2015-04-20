@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   get 'api/get_term_start_date'
   get 'api/get_attendees_by_course_id'
   get 'api/get_attendance_count_for_graph'
+  post 'api/attend'
 
 
 
