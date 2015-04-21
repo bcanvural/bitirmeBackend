@@ -270,7 +270,8 @@ class ApiController < ApplicationController
             course_entities.each do |ce|
               custom_attendance_count = {:day => ce.day,
                                          :start_time => ce.start_time,
-                                         :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id).count()
+                                         :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id).count(),
+                                         :total_weeks => (Time.now - Constants.find(1).termstartdate.to_time).to_i / (60*60*24*7)
                                         }
               custom.push(custom_attendance_count)
             end
@@ -280,7 +281,8 @@ class ApiController < ApplicationController
                                          :start_time => ce.start_time,
                                          :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
                                                                         .where("created_at > ?",((Time.now-(4*7*24*60*60)).to_time))
-                                                                        .count()
+                                                                        .count(),
+                                          :total_weeks => 4
                                         }
               custom.push(custom_attendance_count)
             end
@@ -290,7 +292,8 @@ class ApiController < ApplicationController
                                          :start_time => ce.start_time,
                                          :total_attendance_count => AttendanceList.where(:course_entity_id => ce.id)
                                                                         .where("created_at > ?",((Time.now-(1*7*24*60*60)).to_time))
-                                                                        .count()
+                                                                        .count(),
+                                         :total_weeks => 1
               }
               custom.push(custom_attendance_count)
             end
@@ -366,7 +369,7 @@ class ApiController < ApplicationController
   end
 
   def getAttendancePercentage c_id
-    return ((AttendanceList.where(:user_id=>@user.id,:course_entity_id => CourseEntity.where(:course_id => c_id).first.id).count() / 1.0) / getTotalLectures(c_id)) * 100
+    return (((AttendanceList.where(:user_id=>@user.id,:course_entity_id => CourseEntity.where(:course_id => c_id).first.id).count() / 1.0) / getTotalLectures(c_id)) * 100).round
   end
 
 
